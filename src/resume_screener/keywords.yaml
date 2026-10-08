@@ -1,0 +1,571 @@
+# Editable vocabularies used by the screening rules (no code changes needed).
+#
+# * Every entry is a case-insensitive Python regular expression; a category matches if ANY of its entries matches.
+# * Single-quoted YAML strings are literal, so write regex backslashes as-is: '\bllms?\b'.
+# * A literal single quote inside an entry is written twice: ''.
+# * Use \b word boundaries for short words (e.g. '\bbert\b') or they will match inside longer words.
+# * The file is validated at start-up; a bad regex or missing section stops the run with a clear message.
+# * Point KEYWORDS_FILE=/path/to/other.yaml at a different file to override this one.
+
+# ---- Eligibility: Python ----
+# The word Python itself.
+python_explicit:
+  - '(?<![\w.])python3?(?![\w])'
+
+# Frameworks that only exist in Python (LangChain/LlamaIndex are excluded on purpose: JS ports exist).
+python_implied:
+  - '\bfastapi\b'
+  - '\bdjango\b'
+  - '\bflask\b'
+  - '\bpytorch\b'
+  - '\bpandas\b'
+  - '\bnumpy\b'
+  - 'scikit-?learn'
+  - '\bpydantic\b'
+  - '\bcelery\b'
+  - '\bsqlalchemy\b'
+  - '\blanggraph\b'
+  - 'google[- ]adk'
+  - '\bstreamlit\b'
+  - '\bpytest\b'
+  - '\buvicorn\b'
+
+# ---- AI capabilities (eligibility + AI-depth scoring) ----
+ai_capabilities:
+  llm_usage:
+    - '\bllms?\b'
+    - 'large language model'
+    - '\bgpt-?[\d4o]'
+    - 'chatgpt'
+    - '\bopenai\b'
+    - '\bgemini\b'
+    - '\bclaude\b'
+    - '\banthropic\b'
+    - '\bllama\b'
+    - '\bmistral\b'
+    - '\bgroq\b'
+    - '\bollama\b'
+    - 'vertex ai'
+    - '\bbedrock\b'
+    - 'generative ai'
+    - '\bgen ?ai\b'
+    - '\bgenai\b'
+    - '\bdeepseek\b'
+  prompting:
+    - 'prompt(?:s|ing)?\b'
+    - 'structured output'
+    - 'few-shot'
+    - 'chain-of-thought'
+    - 'json schema'
+    - 'output parser'
+  retrieval:
+    - '\brag\b'
+    - 'retrieval[- ]augmented'
+    - 'embeddings?'
+    - 'vector (?:db|database|store|search|index)'
+    - '\bfaiss\b'
+    - '\bchroma(?:db)?\b'
+    - '\bpinecone\b'
+    - '\bqdrant\b'
+    - '\bweaviate\b'
+    - '\bpgvector\b'
+    - '\bmilvus\b'
+    - 'semantic search'
+    - 're-?rank'
+    - 'chunking'
+    - 'llama-?index'
+    - 'knowledge (?:base|graph)'
+    - 'graph ?rag'
+    - 'opensearch'
+  agents:
+    - 'agentic'
+    - 'langgraph'
+    - 'langchain'
+    - 'crew ?ai'
+    - 'autogen'
+    - 'google[- ]adk'
+    - '\badk\b'
+    - 'multi-?agent'
+    - 'tool[- ]calling'
+    - 'tool use'
+    - 'function calling'
+    - '\bmcp\b'
+    - 'model context protocol'
+    - '\bai agents?\b'
+    - '\bllm agents?\b'
+    - '\bagents?\b'
+    - 'orchestrat'
+    - 'react agent'
+    - 'smolagents'
+    - 'semantic kernel'
+  state_workflow:
+    - 'stateful'
+    - 'state machine'
+    - 'agent memory'
+    - '\bmemory\b'
+    - 'checkpoint'
+    - 'conversation(?:al)? (?:history|state|memory)'
+    - 'session state'
+    - 'workflow'
+    - 'human-in-the-loop'
+    - 'conditional routing'
+    - '\bgraph\b'
+    - 'state schema'
+  evaluation:
+    - 'evaluat'
+    - '\bragas\b'
+    - 'benchmark'
+    - 'guardrail'
+    - 'hallucinat'
+    - 'langsmith'
+    - 'langfuse'
+    - 'llm[- ]as[- ]a?[- ]?judge'
+    - '\bevals?\b'
+    - 'precision'
+    - '\brecall\b'
+    - 'f1[- ]score'
+    - '\bmetrics?\b'
+    - 'accuracy'
+  fine_tuning:
+    - 'fine-?tun'
+    - '\blora\b'
+    - '\bqlora\b'
+    - '\bpeft\b'
+    - '\brlhf\b'
+    - '\bdpo\b'
+
+# Capabilities that make a project/experience entry an 'AI entry' (names from ai_capabilities).
+ai_anchors:
+  - llm_usage
+  - retrieval
+  - agents
+
+# Generic words ('agent', 'orchestrat...') that only count next to an LLM/retrieval signal.
+weak_agent:
+  - '\bagents?\b'
+  - 'orchestrat'
+
+# Classical ML / computer vision. Counts as AI evidence only if allow_classical_ml is enabled in config.py.
+classical_ml:
+  - 'tensorflow'
+  - '\bkeras\b'
+  - '\bpytorch\b'
+  - 'scikit-?learn'
+  - '\bsklearn\b'
+  - '\bcnn\b'
+  - '\byolo'
+  - 'opencv'
+  - 'machine learning'
+  - 'deep learning'
+  - '\bnlp\b'
+  - 'computer vision'
+  - 'neural network'
+  - 'xgboost'
+  - 'hugging ?face'
+  - '\btransformers?\b'
+  - '\bbert\b'
+  - '\bbart\b'
+  - 'image classification'
+  - 'insightface'
+  - 'face recognition'
+
+# Verbs that show the candidate built/owned the work.
+ownership_verbs:
+  - '\b(?:built|implemented|designed|developed|engineered|architected|deployed|optimi[sz]ed|created|integrated|led|reduced|improved|automated|established|introduced|operationali[sz]ed|migrated|wrote)\b'
+
+# Signals that an LLM project is more than 'prompt -> API call -> text out' (not a thin wrapper).
+thin_escape:
+  - 'retriev'
+  - '\brag\b'
+  - 'vector'
+  - 'embedding'
+  - 'agent'
+  - 'langgraph'
+  - '\bstate'
+  - 'evaluat'
+  - 'pipeline'
+  - 'database'
+  - 'postgres'
+  - 'redis'
+  - '\bsql'
+  - 'cach'
+  - 'queue'
+  - 'celery'
+  - 'tool'
+  - 'workflow'
+  - 'orchestrat'
+  - 'fastapi'
+  - 'flask'
+  - 'django'
+  - 'async'
+  - 'authenticat'
+  - 'pars(?:ing|er)'
+  - 'ingest'
+  - 'chunk'
+  - '\brank'
+  - 'scor(?:e|ing)'
+  - 'memory'
+  - 'mongodb'
+  - '\bapi\b.*\b(?:endpoint|service)'
+  - 'microservice'
+
+# ---- Scoring vocabularies ----
+# Python & backend category (points per key are in config.py).
+backend_terms:
+  python:
+    - '(?<![\w.])python3?(?![\w])'
+  web_framework:
+    - '\bfastapi\b'
+    - '\bdjango\b'
+    - '\bflask\b'
+    - '\bstarlette\b'
+    - '\btornado\b'
+  async:
+    - '\basyncio\b'
+    - '\basync\b'
+    - '\bawait\b'
+    - '\baiohttp\b'
+    - '\bhttpx\b'
+    - '\bconcurren'
+    - '\bcoroutine'
+  postgresql:
+    - 'postgre(?:sql|s)?\b'
+    - '\bpgvector\b'
+    - '\bpsycopg'
+  redis:
+    - '\bredis\b'
+  api_design:
+    - 'rest(?:ful)? ?api'
+    - '\bgraphql\b'
+    - '\bgrpc\b'
+    - '\bwebsockets?\b'
+    - '\bsse\b'
+    - 'openapi'
+    - '\bswagger\b'
+  orm_tasks:
+    - 'sqlalchemy'
+    - '\balembic\b'
+    - '\bcelery\b'
+    - '\bkafka\b'
+    - 'rabbitmq'
+    - '\bmongodb\b'
+    - '\bprisma\b'
+
+# Cloud / deployment / full-stack category.
+cloud_terms:
+  gcp:
+    - '\bgcp\b'
+    - 'google cloud'
+    - 'cloud run'
+    - 'vertex ai'
+    - '\bbigquery\b'
+    - 'cloud functions'
+    - 'firebase'
+    - '\bgke\b'
+    - 'cloud sql'
+  other_cloud:
+    - '\baws\b'
+    - '\bazure\b'
+    - '\bec2\b'
+    - '\blambda\b'
+    - '\bs3\b'
+    - '\becs\b'
+    - 'amazon web services'
+  docker:
+    - '\bdocker'
+    - 'containeri[sz]ed'
+  kubernetes:
+    - 'kubernetes'
+    - '\bk8s\b'
+    - '\bhelm\b'
+  ci_cd:
+    - 'ci/?cd'
+    - 'github actions'
+    - '\bjenkins\b'
+    - 'deploy'
+    - '\bvercel\b'
+    - '\brender\b'
+    - '\bheroku\b'
+    - '\bnetlify\b'
+  frontend:
+    - '\breact(?:\.js|js)?\b'
+    - 'next\.?js'
+    - '\bvue\b'
+    - '\bangular\b'
+    - '\bsvelte'
+
+# Engineering-depth category: each distinct key is one signal.
+engineering_terms:
+  testing:
+    - '\bpytest\b'
+    - 'unit tests?'
+    - 'integration tests?'
+    - 'test coverage'
+    - '\btdd\b'
+    - '\bjest\b'
+    - 'test suite'
+    - '\bunittest\b'
+  architecture:
+    - 'microservice'
+    - 'architect'
+    - 'design pattern'
+    - 'event-driven'
+    - 'modular'
+    - 'clean architecture'
+    - 'system design'
+    - 'domain-driven'
+  caching:
+    - '\bcach(?:e|ed|ing)\b'
+    - '\bredis\b'
+    - '\blru\b'
+    - 'memoiz'
+  queues:
+    - '\bkafka\b'
+    - 'rabbitmq'
+    - '\bcelery\b'
+    - 'message queue'
+    - 'task queue'
+    - '\bsqs\b'
+    - 'pub/?sub'
+    - 'background (?:job|task|worker)'
+  observability:
+    - 'observab'
+    - '\blogging\b'
+    - 'monitoring'
+    - 'tracing'
+    - 'prometheus'
+    - 'grafana'
+    - 'langsmith'
+    - 'opentelemetry'
+    - 'sentry'
+    - 'cloudwatch'
+  concurrency:
+    - 'concurren'
+    - '\bparallel'
+    - 'multi-?thread'
+    - '\basyncio\b'
+    - '\bthread'
+    - 'rate[- ]limit'
+  failure_handling:
+    - '\bretr(?:y|ies)\b'
+    - 'fallback'
+    - 'error handling'
+    - 'fault[- ]toleran'
+    - 'circuit breaker'
+    - 'idempoten'
+    - 'graceful'
+    - 'exponential backoff'
+    - 'dead[- ]letter'
+
+# Skill names reported in matched_skills (display name -> patterns).
+skill_vocab:
+  Python:
+    - '(?<![\w.])python3?(?![\w])'
+  FastAPI:
+    - '\bfastapi\b'
+  Django:
+    - '\bdjango\b'
+  Flask:
+    - '\bflask\b'
+  Asyncio:
+    - '\basyncio\b'
+  Pydantic:
+    - '\bpydantic\b'
+  PostgreSQL:
+    - 'postgre(?:sql|s)?\b'
+    - '\bpgvector\b'
+    - '\bpsycopg'
+  Redis:
+    - '\bredis\b'
+  MongoDB:
+    - '\bmongodb\b'
+  MySQL:
+    - '\bmysql\b'
+  SQL:
+    - '\bsql\b'
+  SQLAlchemy:
+    - 'sqlalchemy'
+  Celery:
+    - '\bcelery\b'
+  Kafka:
+    - '\bkafka\b'
+  LangChain:
+    - 'langchain'
+  LangGraph:
+    - 'langgraph'
+  LlamaIndex:
+    - 'llama-?index'
+  Google ADK:
+    - 'google[- ]adk'
+    - '\badk\b'
+  CrewAI:
+    - 'crew ?ai'
+  AutoGen:
+    - 'autogen'
+  MCP:
+    - '\bmcp\b'
+    - 'model context protocol'
+  RAG:
+    - '\brag\b'
+    - 'retrieval[- ]augmented'
+  Embeddings:
+    - 'embeddings?'
+  Vector Search:
+    - 'vector (?:db|database|store|search)'
+    - '\bpgvector\b'
+    - '\bfaiss\b'
+    - '\bchroma(?:db)?\b'
+    - '\bpinecone\b'
+    - '\bqdrant\b'
+    - '\bweaviate\b'
+  LLMs:
+    - '\bllms?\b'
+    - 'large language model'
+    - 'generative ai'
+    - '\bgen ?ai\b'
+  OpenAI:
+    - '\bopenai\b'
+    - '\bgpt-?[\d4o]'
+  Gemini:
+    - '\bgemini\b'
+  Claude:
+    - '\bclaude\b'
+    - '\banthropic\b'
+  Hugging Face:
+    - 'hugging ?face'
+    - '\btransformers\b'
+  Prompt Engineering:
+    - 'prompt engineering'
+    - 'prompting'
+  Tool Calling:
+    - 'tool[- ]calling'
+    - 'function calling'
+  Multi-Agent:
+    - 'multi-?agent'
+  Agents:
+    - '\bagentic\b'
+    - '\bai agents?\b'
+    - '\bllm agents?\b'
+  Evaluation:
+    - '\bragas\b'
+    - 'evaluation pipeline'
+    - 'llm[- ]as[- ]a?[- ]?judge'
+  Fine-tuning:
+    - 'fine-?tun'
+    - '\blora\b'
+  PyTorch:
+    - 'pytorch'
+  TensorFlow:
+    - 'tensorflow'
+  scikit-learn:
+    - 'scikit-?learn'
+  OpenCV:
+    - 'opencv'
+  NLP:
+    - '\bnlp\b'
+  Docker:
+    - '\bdocker'
+  Kubernetes:
+    - 'kubernetes'
+    - '\bk8s\b'
+  GCP:
+    - '\bgcp\b'
+    - 'google cloud'
+    - 'cloud run'
+    - 'vertex ai'
+    - '\bbigquery\b'
+    - 'cloud functions'
+    - 'firebase'
+    - '\bgke\b'
+    - 'cloud sql'
+  AWS:
+    - '\baws\b'
+    - 'amazon web services'
+  Azure:
+    - '\bazure\b'
+  Vercel:
+    - '\bvercel\b'
+  CI/CD:
+    - 'ci/?cd'
+    - 'github actions'
+  React:
+    - '\breact(?:\.js|js)?\b'
+  Next.js:
+    - 'next\.?js'
+  TypeScript:
+    - 'typescript'
+  JavaScript:
+    - 'javascript'
+  Node.js:
+    - 'node\.?js'
+  Java:
+    - '\bjava\b'
+  Spring Boot:
+    - 'spring ?boot'
+  C++:
+    - 'c\+\+'
+  Go:
+    - '\bgolang\b'
+  Streamlit:
+    - 'streamlit'
+  Pytest:
+    - '\bpytest\b'
+  GraphQL:
+    - 'graphql'
+  Neo4j:
+    - 'neo4j'
+  Pandas:
+    - '\bpandas\b'
+  NumPy:
+    - '\bnumpy\b'
+
+# Resume section headings, matched against a short, lower-cased line.
+section_headings:
+  skills:
+    - '^(?:technical |core |key )?skills?(?: (?:&|and) \w+)?$'
+    - '^core technical expertise$'
+    - '^tech(?:nical)? stack$'
+    - '^tools?(?: (?:&|and) \w+)?$'
+    - '^technologies$'
+    - '^languages?(?: known)?$'
+    - '^(?:core |key )?competenc'
+    - '^skills? summary$'
+  projects:
+    - '^(?:key |personal |academic |selected |notable )?projects?$'
+    - '^project experience$'
+  experience:
+    - '^(?:work |professional |relevant |industrial )?experience$'
+    - '^internships?$'
+    - '^employment'
+    - '^work history$'
+    - '^open[- ]source'
+  education:
+    - '^education'
+    - '^academic'
+  certifications:
+    - '^certifications?'
+    - '^certificates$'
+    - '^certificates (?:&|and) \w+'
+    - '^achievements?'
+    - '^key achievements'
+    - '^awards?'
+    - '^coursework'
+  summary:
+    - '^(?:professional |resume |career |profile )?(?:summary|profile|objectives?|about me)$'
+  other:
+    - '^area of interest'
+    - '^co-?curricular'
+    - '^career aspiration'
+    - '^involvement'
+    - '^find me online'
+    - '^links$'
+    - '^personal (?:details|information)$'
+    - '^get in touch'
+    - '^interests?$'
+    - '^hobbies$'
+    - '^references?$'
+    - '^declaration$'
+    - '^extra[- ]?curricular'
+    - '^positions? of responsibility$'
+    - '^publications?$'
+    - '^volunteer'

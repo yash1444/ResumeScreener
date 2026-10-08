@@ -1,0 +1,41 @@
+# ---- Secrets: never commit (keep only the placeholder file .env.example)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- Local caches (the LLM cache holds text derived from resumes; the GitHub cache holds API data)
+.cache/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# ---- Virtual environments
+.venv/
+.venv_*/
+venv/
+env/
+
+# ---- Scratch / temporary files created while working
+.scratch/
+.eval/
+.tmp_*
+tmp_*/
+*.tmp
+*.log
+
+# ---- Packaging output
+*.zip
+dist/
+build/
+*.egg-info/
+
+# ---- Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
